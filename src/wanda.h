@@ -70,11 +70,18 @@ class Wanda {
     bool just_show;
       // if this is true, we just show the system and don't prove
       // termination or handle a query or anything
+    bool just_name;
+      // if this is true, we just print the name and don't do
+      // anything else
     string outputfile;
       // the file to which the proof should be written; if empty this
       // is just stdout
+    bool use_resourcedir;
+      // whether we should use resources like the sat solver and
+      // external first-order tool from the resource directory
+      // (./resources); if false, they will be assumed given in the
+      // overall path
     bool allow_nontermination;
-                              // 2: only in the first-order part
     bool allow_redpair;
     bool allow_rulesremoval;
     bool allow_dp;

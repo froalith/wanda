@@ -34,8 +34,13 @@ class FirstOrderSplitter {
   private:
     RulesManipulator manip;
     set<string> PHO, TFO;
-    string fotool;
-    string fonontool;
+    string fotoolpath;
+    string fotoolname;
+    string fonontoolpath;
+    string fonontoolname;
+    string systemfile;
+    string resultfile;
+    bool global_tools;
 
     bool first_order(PTerm term);
     string print_functionally(PTerm term, Environment &gamma);
@@ -53,7 +58,8 @@ class FirstOrderSplitter {
 
   public:
     FirstOrderSplitter(Alphabet &Sigma, Ruleset &Rules,
-                       string FOtool, string FOnontool);
+                       string FOtool, string FOnontool,
+                       bool global_resources);
     bool first_order(DPSet &D);
     bool first_order(MatchRule *rule);
     Ruleset first_order_part(Ruleset &R);
@@ -70,10 +76,11 @@ class FirstOrderSplitter {
       // non-termination; moreover, this only returns "NO" (meaning
       // non-termination) if a SORTABLE counterexample was found;
       // reason contains a proof in the case of YES or NO
-    string query_tool();
+    string query_tool_path();
     string query_tool_name();
-    string query_non_tool();
+    string query_non_tool_path();
     string query_non_tool_name();
+    bool use_global_resources();
 };
 
 #endif

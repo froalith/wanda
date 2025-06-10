@@ -26,9 +26,23 @@
 FirstOrderSplitter :: FirstOrderSplitter(Alphabet &Sigma,
                                          Ruleset &rules,
                                          string FOtool,
-                                         string FOnontool) {
-  fotool = FOtool;
-  fonontool = FOnontool;
+                                         string FOnontool,
+                                         bool global) {
+  fotoolname = FOtool;
+  fonontoolname = FOnontool;
+  global_tools = global;
+  if (global) {
+    fotoolpath = FOtool;
+    fonontoolpath = FOnontool;
+    systemfile = "system.trs";
+    resultfile = "result.trs";
+  }
+  else {
+    fotoolpath = "./resources/" + FOtool;
+    fonontoolpath = "./resources/" + FOnontool;
+    systemfile = "resources/system.trs";
+    resultfile = "resources/result.trs";
+  }
 
   // initialise TFO and PHO
   vector<string> symbols = Sigma.get_all();
@@ -416,13 +430,12 @@ string FirstOrderSplitter :: determine_termination_main(
   return "MAYBE";
   */
 
-  create_file(rules, innermost, "resources/system.trs");
+  create_file(rules, innermost, systemfile);
 
-  system(("./resources/" + fotool + " resources/system.trs 50 > "
-         "resources/result").c_str());
+  system((fotoolpath + " " + systemfile + " 50 > " + resultfile).c_str());
 
   // get results
-  ifstream ifile("resources/result");
+  ifstream ifile(resultfile);
   if (ifile.eof()) {
     reason = "First-order termination prover did not provide a result.\n";
     return "MAYBE";
@@ -438,7 +451,8 @@ string FirstOrderSplitter :: determine_termination_main(
     getline(ifile, input);
     reason += " || " + input + "\n";
   }
-  system("rm resources/result");
+  system(("rm " + systemfile).c_str());
+  system(("rm " + resultfile).c_str());
 
   return result;
 }
@@ -486,13 +500,12 @@ string FirstOrderSplitter :: determine_nontermination(
                          bool innermost,
                          string &reason) {
 
-  create_file(rules, innermost, "resources/system.trs");
+  create_file(rules, innermost, systemfile);
 
-  system(("./resources/" + fonontool + " resources/system.trs 50 > "
-         "resources/result").c_str());
+  system((fonontoolpath + " " + systemfile + " 50 > " + resultfile).c_str());
 
   // get result
-  ifstream ifile("resources/result");
+  ifstream ifile(resultfile);
   if (ifile.eof()) return "MAYBE";
   string result;
   getline(ifile, result);
@@ -514,7 +527,8 @@ string FirstOrderSplitter :: determine_nontermination(
       getline(ifile, input);
       reason += " || " + input + "\n";
     }
-    system("rm resources/result");
+    system(("rm " + systemfile).c_str());
+    system(("rm " + resultfile).c_str());
     return "NO";
   }
 
@@ -536,25 +550,30 @@ string FirstOrderSplitter :: determine_nontermination(
     getline(ifile, input);
     reason += " || " + input + "\n";
   }
-  system("rm resources/result");
+  system(("rm " + systemfile).c_str());
+  system(("rm " + resultfile).c_str());
 
   // and return with success!
   return result;
 }
 
-string FirstOrderSplitter :: query_tool() {
-  return fotool;
+string FirstOrderSplitter :: query_tool_path() {
+  return fotoolpath;
 }
 
 string FirstOrderSplitter :: query_tool_name() {
-  return fotool;
+  return fotoolname;
 }
 
-string FirstOrderSplitter :: query_non_tool() {
-  return fonontool;
+string FirstOrderSplitter :: query_non_tool_path() {
+  return fonontoolpath;
 }
 
 string FirstOrderSplitter :: query_non_tool_name() {
-  return fonontool;
+  return fonontoolname;
+}
+
+bool FirstOrderSplitter :: use_global_resources() {
+  return global_tools;
 }
 

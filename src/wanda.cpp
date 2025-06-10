@@ -1,5 +1,5 @@
 /**************************************************************************
-   Copyright 2012, 2013, 2019 Cynthia Kop
+   Copyright 2012, 2013, 2019, 2025 Cynthia Kop
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "inputreaderfo.h"
 #include "nonterminator.h"
 #include "outputmodule.h"
+#include "sat.h"
 #include "ruleremover.h"
 #include "xmlreader.h"
 #include <iostream>
@@ -43,7 +44,10 @@ void Wanda :: run(vector<string> args) {
     cout << "ERROR" << endl << error << endl;
     return;
   }
-  if (args.size() == 0) args.push_back("--manual");
+  if (args.size() == 0) {
+    if (just_name) { cout << "Wanda" << endl; return; }
+    else args.push_back("--manual");
+  }
 
   // read all the input files, and work with them!
   aborted = false;
@@ -99,12 +103,14 @@ void Wanda :: parse_runtime_arguments(vector<string> &args) {
   error = "";
   do_rewriting = false;
   just_show = false;
+  just_name = false;
   firstorder = "firstorderprover";
   firstordernont = "firstordernonprover";
   outputfile = "";
   string disable = "";
   string style = "";
   use_betafirst = false;
+  use_resourcedir = true;
   simplify_meta = true;
   formal = false;
 
@@ -121,7 +127,9 @@ void Wanda :: parse_runtime_arguments(vector<string> &args) {
     else if (arg == "--debug") wout.set_debugmode(true);
     else if (arg == "--rewrite") do_rewriting = true;
     else if (arg == "--show") just_show = true;
+    else if (arg == "--name") just_name = true;
     else if (arg == "--betafirst") use_betafirst = true;
+    else if (arg == "--global") use_resourcedir = false;
     else if (arg == "--dontsimplify") simplify_meta = false;
     else if (arg == "--formal") { formal = true; simplify_meta = false; }
     else if (arg.substr(0,9) == "--format=")
@@ -138,6 +146,8 @@ void Wanda :: parse_runtime_arguments(vector<string> &args) {
       style = arg.substr(8);
     else if (arg.substr(0,9) == "--output=")
       outputfile = arg.substr(9);
+    else if (arg.substr(0,10) == "--timeout=" ||
+             arg.substr(0,11) == "--category=") continue;
     else if (arg.substr(0,2) == "--") {
       error = "Could not parse runtime arguments: unknown "
         "parameter, '" + arg + "'.";
@@ -153,6 +163,7 @@ void Wanda :: parse_runtime_arguments(vector<string> &args) {
       else if (arg[j] == 'D') wout.set_debugmode(true);
       else if (arg[j] == 'w') just_show = true;
       else if (arg[j] == 'l') formal = true;
+      else if (arg[j] == 'g') use_resourcedir = false;
       else if (arg[j] == 'f' || arg[j] == 'i' || arg[j] == 'd' ||
                arg[j] == 'q' || arg[j] == 'y' || arg[j] == 'o' ||
                arg[j] == 'n') {
@@ -239,6 +250,9 @@ void Wanda :: parse_runtime_arguments(vector<string> &args) {
     error = "Unknown style: " + style;
     return;
   }
+
+  // set up the sat solver based on the resource dir setting
+  satsolver.set_resource_dir(use_resourcedir);
 
   // prune arguments so only the files remain, and check formalisms
   for (i = 0; i < args.size(); i++) {
@@ -519,6 +533,7 @@ string Wanda :: prove_termination(Alphabet &F, vector<MatchRule*> &R,
   // with the remaining rules, use the dependency pair framework
   if (allow_dp) {
     DependencyFramework framework(F, R, firstorder, firstordernont,
+                                  !use_resourcedir,
                                   allow_static_dp, allow_dynamic_dp);
     if (!allow_graph) framework.disable_graph();
     if (!allow_subcrit) framework.disable_subcrit();

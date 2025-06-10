@@ -20,6 +20,21 @@
 #include <cstdlib>
 #include <iostream>
 
+SatSolver :: SatSolver() {
+  set_resource_dir(true);
+}
+
+void SatSolver :: set_resource_dir(bool use_directory) {
+  if (use_directory) {
+    resource_dir = "resources/";
+    solver_command = "./resources/satsolver";
+  }
+  else {
+    resource_dir = "";
+    solver_command = "satsolver";
+  }
+}
+
 bool SatSolver :: solve(PFormula &formula) {
   formula = formula->conjunctive_form();
 
@@ -62,7 +77,7 @@ bool SatSolver :: solve(PFormula &formula) {
     }
     // generate a file with all restrictions in the SAT competition format
     int size = con->query_number_children();
-    FILE *fout = fopen("resources/input", "w");
+    FILE *fout = fopen((resource_dir + "input").c_str(), "w");
     fprintf(fout, "p cnf %d %d\n", vars.query_size(), size);
     for (int i = 0; i < size; i++) {
       PFormula child = con->query_child(i);
@@ -102,12 +117,13 @@ bool SatSolver :: solve(PFormula &formula) {
 
     fclose(fout);
 
-    // now run minisat on the generated file
+    // now run the sat solver on the generated file
     // system("./resources/timeout 20 ./resources/satsolver resources/input resources/output > /dev/null");
-    system("./resources/timeout.sh 20 ./resources/satsolver resources/input resources/output > /dev/null");
+    system(("timeout 20 " + solver_command + " " + resource_dir + "input " +
+           resource_dir + "output > /dev/null").c_str());
 
     // and read the results!
-    FILE *fin = fopen("resources/output", "r");
+    FILE *fin = fopen((resource_dir + "output").c_str(), "r");
     char check[10];
     if (fin == NULL) return false;
     fscanf(fin, "%s", check);
@@ -119,12 +135,12 @@ bool SatSolver :: solve(PFormula &formula) {
         else vars.force_value(var, TRUE);
       }
       fclose(fin);
-      system("rm resources/output");
+      system(("rm " + resource_dir + "output").c_str());
       return true;
     }
     else {
       fclose(fin);
-      system("rm resources/output");
+      system(("rm " + resource_dir + "output").c_str());
       return false;
     }
   }
@@ -132,4 +148,6 @@ bool SatSolver :: solve(PFormula &formula) {
   // if it's something else, we can't handle it
   return false;
 }
+
+SatSolver satsolver;
 

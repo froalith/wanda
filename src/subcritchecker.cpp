@@ -37,7 +37,6 @@ bool SubtermCriterionChecker :: run(DPSet &set, DPSet &strict,
   }
 
   formula = new And();
-  SatSolver sat;
 
   get_maximal_arities(set);
   declare_nu_variables();
@@ -47,7 +46,7 @@ bool SubtermCriterionChecker :: run(DPSet &set, DPSet &strict,
   bool ret;
   PFormula form = formula;
 
-  if (sat.solve(form)) {
+  if (satsolver.solve(form)) {
     ret = true;
     get_solution(set, strict, nonstrict, F, original_arities, false);
     wout.succeed_method("subterm criterion");
@@ -82,7 +81,6 @@ bool SubtermCriterionChecker :: run_static(DPSet &set, DPSet &strict,
   }
 
   formula = new And();
-  SatSolver sat;
 
   get_maximal_arities(set);
   declare_nu_variables();
@@ -91,7 +89,7 @@ bool SubtermCriterionChecker :: run_static(DPSet &set, DPSet &strict,
   bool ret;
   PFormula form = formula;
 
-  if (sat.solve(form)) {
+  if (satsolver.solve(form)) {
     ret = true;
     get_solution(set, strict, nonstrict, F, original_arities, true);
     wout.succeed_method("accessible subterm criterion");

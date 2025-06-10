@@ -48,6 +48,12 @@ Command-line arguments:
   * --firstordernon=\<file\>, -n \<file\>
     Similar as --firstorder=<file>, but considering a separate prover
     that is used for non-termination analysis.
+  * --global, -g
+    If this parameter is given, then the first-order termination
+    prover and SAT solver are not expected to be in the resources
+    directory, but rather available from the path.  This will also
+    cause temporary files to be written in the current directory
+    rather than a dedicated resource directory.
   * --disable=\<list\>, -d \<list\>
     You can disable certain features of WANDA; for example to
     disable non-termination proving and rules removal, use

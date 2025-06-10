@@ -46,8 +46,7 @@ vector<int> Horpo :: orient(OrderingProblem *prob) {
   PFormula formula = constraints.generate_complete_formula();
   formula = formula->simplify();
 
-  SatSolver sat;
-  if (!sat.solve(formula)) {
+  if (!satsolver.solve(formula)) {
     delete formula;
     wout.abort_method("horpo");
     return ret;

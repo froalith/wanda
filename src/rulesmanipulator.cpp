@@ -501,8 +501,7 @@ bool RulesManipulator :: check_inequalities(And *formula,
 
   // simplify the formula and send it to a sat solver!
   PFormula f = formula->simplify();
-  SatSolver solver;
-  bool ret = solver.solve(f);
+  bool ret = satsolver.solve(f);
   delete f;
 
   // if it's not solvable, we can return straight away

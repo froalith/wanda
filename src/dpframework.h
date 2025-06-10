@@ -211,6 +211,7 @@ class DependencyFramework {
   public:
     DependencyFramework(Alphabet &Sigma, Ruleset &rules,
                         string fotool, string fonontool,
+                        bool foglobal,
                         bool allow_static = true,
                         bool allow_dynamic = true);
     ~DependencyFramework();

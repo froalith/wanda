@@ -20,10 +20,20 @@
 #include "formula.h"
 
 class SatSolver {
+  private:
+    string solver_command;
+    string resource_dir;
+
   public:
+    SatSolver();
+    void set_resource_dir(bool use);
+      // this sets whether or not we should use the resources/
+      // directory for writing files and calling the SAT solver
     bool solve(PFormula &form);
       // if solvable, returns true and sets the variables to prove it
       // if not solvable or unknown, returns false
 };
+
+extern SatSolver satsolver;
 
 #endif

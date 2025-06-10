@@ -59,12 +59,11 @@ int BitBlaster :: overflow_bound() {
 }
 
 bool BitBlaster :: solve(PFormula formula, vector<int> &values) {
-  SatSolver sat;
   handle_formula(formula);
   delete formula;
   PFormula f = sat_formula->simplify();
   //cout << "f = " << f->to_string() << endl;
-  if (!sat.solve(f)) {
+  if (!satsolver.solve(f)) {
     delete f;
     return false;
   }
@@ -161,7 +160,10 @@ void BitBlaster :: handle_formula(PFormula formula) {
 
 int BitBlaster :: bit(int index, int i) {
   if (i < 0 || index < 0 || index >= numbits.size() ||
-      i >= numbits[index]) cout << "MAYBE\naaaaaargh!" << endl;
+      i >= numbits[index]) {
+    cout << "MAYBE\naaaaaargh!" << endl;
+    return 0;
+  }
   else return bitstart[index] + i;
 }
 
@@ -172,8 +174,10 @@ int BitBlaster :: new_var() {
 }
 
 int BitBlaster :: overflow_bit(int index) {
-  if (numbits[index] <= MAXBITS)
+  if (numbits[index] <= MAXBITS) {
     cout << "overflow bit queried of number without overflow" << endl;
+    return 0;
+  }
   else return bit(index, MAXBITS);
 }
 

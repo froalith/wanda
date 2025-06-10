@@ -34,6 +34,7 @@ DependencyFramework :: DependencyFramework(Alphabet &Sigma,
                                            Ruleset &rules,
                                            string FOtool,
                                            string FOnontool,
+                                           bool FOglobal,
                                            bool _allow_static,
                                            bool _allow_dynamic)
      : allow_static(_allow_static), allow_dynamic(_allow_dynamic),
@@ -41,7 +42,7 @@ DependencyFramework :: DependencyFramework(Alphabet &Sigma,
        allow_polynomials(true), allow_horpo(true),
        allow_product_polynomials(true), allow_usable(true),
        allow_formative(true), allow_uwrt(true), allow_fwrt(true),
-       splitter(Sigma, rules, FOtool, FOnontool),
+       splitter(Sigma, rules, FOtool, FOnontool, FOglobal),
        found_counterexample(false), FOstatus(0), expanded(false) {
 
   int i;
@@ -563,8 +564,9 @@ bool DependencyFramework :: force_static_approach() {
   wout.verbose_print("Thus, instead we move to the static case.\n");
 
   // check whether this caused a different first-order part
-  splitter = FirstOrderSplitter(F, R, splitter.query_tool(),
-                                splitter.query_non_tool());
+  splitter = FirstOrderSplitter(F, R, splitter.query_tool_name(),
+                                splitter.query_non_tool_name(),
+                                splitter.use_global_resources());
   int newsize = splitter.first_order_part(R).size();
   if (newsize != firstordersize) FOstatus = 0;
 
