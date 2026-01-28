@@ -1,5 +1,5 @@
 # Variable declarations
-CXX = g++ -g -O0
+CXX = g++ -O2
 SYS := $(shell gcc -dumpmachine)
 BUILD_DIR := ./build
 BIN_DIR := ./bin

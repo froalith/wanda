@@ -1,0 +1,4 @@
+(VAR)
+(RULES
+  f(g) -> g
+)

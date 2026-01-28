@@ -37,8 +37,8 @@
 void Wanda :: run(vector<string> types, vector<string> terms) {
   //if (args.size() >= 2) args.pop_back();
     // competition parameter, remove afterwards
-
-  // parse_runtime_arguments(args);
+  vector<string> placeholder = {};
+  parse_runtime_arguments(placeholder);
 
   // // if runtime errors had an argument or were easy to deal with
   // // immediately, get out
@@ -75,7 +75,9 @@ void Wanda :: run(vector<string> types, vector<string> terms) {
     //   aborted = false;
     //   continue;
     // }
-    wout.print_system(Sigma, rules);
+
+
+    // wout.print_system(Sigma, rules);
 
     // and deal with it
     if (do_rewriting) rewrite_term();
@@ -94,7 +96,7 @@ void Wanda :: run(vector<string> types, vector<string> terms) {
 
 void Wanda :: parse_runtime_arguments(vector<string> &args) {
   formalism = "";
-  silent = false;
+  silent = true;
   error = "";
   do_rewriting = false;
   just_show = false;
@@ -679,19 +681,20 @@ int main(int argc, char **argv) {
   types = decoder(argv[1]);
   termsLR = decoder(argv[2]);
   termsRL = decoder(argv[3]);
-  cout << " terms: \n";
-  for(auto & it: types) {
-    cout << it << '\n';
-  }
 
-  cout << " terms lr: \n";
-  for(auto & it: termsLR) {
-    cout << it << '\n';
-  }
-  cout << " terms rl: \n";
-  for(auto & it: termsRL) {
-    cout << it << '\n';
-  }
+  // cout << " terms: \n";
+  // for(auto & it: types) {
+  //   cout << it << '\n';
+  // }
+
+  // cout << " terms lr: \n";
+  // for(auto & it: termsLR) {
+  //   cout << it << '\n';
+  // }
+  // cout << " terms rl: \n";
+  // for(auto & it: termsRL) {
+  //   cout << it << '\n';
+  // }
   Wanda wanda;
   wanda.run(types, termsLR);
   wanda.run(types, termsRL);

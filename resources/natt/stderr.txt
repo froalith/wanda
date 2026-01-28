@@ -1,0 +1,1 @@
+resources/natt/starexec_run_Default: line 4: resources/natt/NaTT.exe: cannot execute binary file
