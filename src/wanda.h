@@ -122,8 +122,7 @@ class Wanda {
       // parses arguments and removes everything except the files
       // from args
 
-    void read_system(string filename, vector<string> types,
-                     vector<string> terms);
+    void read_system(string filename);
       // reads the given system into an AFSM
 
     void write_system();
@@ -159,7 +158,7 @@ class Wanda {
       // respond with YES if true, NO if false
 
   public:
-    void run(vector<string> types, vector<string> terms);
+    void run(vector<string> args);
 };
 
 #endif

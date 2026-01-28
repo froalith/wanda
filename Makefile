@@ -1,5 +1,5 @@
 # Variable declarations
-CXX = g++ -g -O0
+CXX = g++
 SYS := $(shell gcc -dumpmachine)
 BUILD_DIR := ./build
 BIN_DIR := ./bin
@@ -84,20 +84,11 @@ $(BUILD_DIR)/minisat/bin/minisat:
 	@echo "Cloning minisat from github..."
 	@rm -rf $(BUILD_DIR)/minisat
 	git clone $(SAT_SOLVER_REPO) $(BUILD_DIR)/minisat
-
-	@echo "Patching MiniSat for C++11 compatibility..."
-	find $(BUILD_DIR)/minisat/minisat -type f \( -name '*.cc' -o -name '*.h' \) \
-	  -exec perl -pi -e 's/"(%)?(PRI[A-Za-z0-9_]+)/"$1 $2/g' {} +
-
 	mkdir -p $(BUILD_DIR)/minisat/bin
-	cd $(BUILD_DIR)/minisat && cmake . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && $(MAKE)
-
+	cd $(BUILD_DIR)/minisat && cmake . && $(MAKE)
 	@echo "Installing minisat executable as satsolver in Wanda's resources folder."
 	mkdir -p $(BIN_DIR)/resources
 	cp $(BUILD_DIR)/minisat/bin/minisat $(BIN_DIR)/resources/satsolver
-
-
-
 
 # Alias for $(BUILD_DIR)/NaTT
 build_natt : $(BUILD_DIR)/NaTT

@@ -35,9 +35,6 @@ class InputReaderAFSM : public TextConverter {
       // sets last_warning and returns NULL if there's a problem
 
   public:
-    // VERYYYY HACKY
-    bool read_override(Alphabet &Sigma, vector<MatchRule*> &rules, vector<string> &types, vector<string> &terms);
-  
     bool read_manually(Alphabet &Sigma, vector<MatchRule*> &rules);
       // returns false if user has chosen to abort
     bool read_file(string filename, Alphabet &Sigma,
