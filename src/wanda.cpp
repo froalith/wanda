@@ -31,48 +31,50 @@
 #include <fstream>
 #include <cstdlib>
 #include <random>
+#include <sstream>
 
-void Wanda :: run(vector<string> args) {
+
+void Wanda :: run(vector<string> types, vector<string> terms) {
   //if (args.size() >= 2) args.pop_back();
     // competition parameter, remove afterwards
 
-  parse_runtime_arguments(args);
+  // parse_runtime_arguments(args);
 
-  // if runtime errors had an argument or were easy to deal with
-  // immediately, get out
-  if (error != "") {
-    cout << "ERROR" << endl << error << endl;
-    return;
-  }
-  if (args.size() == 0) {
-    if (just_name) { cout << "Wanda" << endl; return; }
-    else args.push_back("--manual");
-  }
+  // // if runtime errors had an argument or were easy to deal with
+  // // immediately, get out
+  // if (error != "") {
+  //   cout << "ERROR" << endl << error << endl;
+  //   return;
+  // }
+  // if (args.size() == 0) {
+  //   if (just_name) { cout << "Wanda" << endl; return; }
+  //   else args.push_back("--manual");
+  // }
 
-  // read all the input files, and work with them!
-  aborted = false;
-  total_yes = total_no = total_maybe = 0;
-  for (int i = 0; i < args.size(); i++) {
-    // basic printing: show what we're working on
-    if (args.size() > 1) {
-      if (!wout.query_verbose() && silent) cout << args[i] << ": ";
-      else cout << "++" << args[i] << ":" << endl;
-    }
+  // // read all the input files, and work with them!
+  // aborted = false;
+  // total_yes = total_no = total_maybe = 0;
+  // for (int i = 0; i < args.size(); i++) {
+  //   // basic printing: show what we're working on
+  //   if (args.size() > 1) {
+  //     if (!wout.query_verbose() && silent) cout << args[i] << ": ";
+  //     else cout << "++" << args[i] << ":" << endl;
+  //   }
 
-    // read the system
-    wout.print("We consider the system " +
-      wout.parse_filename(args[i]) + ".\n");
-    read_system(args[i]);
-    if (error != "") {
-      cout << "ERROR" << endl;
-      if (!silent) cout << error << endl;
-      error = "";
-      continue;
-    }
-    if (aborted) {
-      aborted = false;
-      continue;
-    }
+  //   // read the system
+  //   wout.print("We consider the system " +
+      // wout.parse_filename(args[i]) + ".\n");
+    read_system("override", types, terms);
+    // if (error != "") {
+    //   cout << "ERROR" << endl;
+    //   if (!silent) cout << error << endl;
+    //   error = "";
+    //   continue;
+    // }
+    // if (aborted) {
+    //   aborted = false;
+    //   continue;
+    // }
     wout.print_system(Sigma, rules);
 
     // and deal with it
@@ -86,15 +88,8 @@ void Wanda :: run(vector<string> args) {
     Sigma.clear();
     for (int j = 0; j < rules.size(); j++) delete rules[j];
     rules.clear();
-  }
+  
 
-  // print statistics
-  if (args.size() > 1) {
-    cout << endl
-         << "TOTAL YES:   " << total_yes << endl
-         << "TOTAL NO:    " << total_no << endl
-         << "TOTAL MAYBE: " << total_maybe << endl;
-  }
 }
 
 void Wanda :: parse_runtime_arguments(vector<string> &args) {
@@ -298,7 +293,13 @@ bool Wanda :: is_number(string txt) {
   return true;
 }
 
-void Wanda :: read_system(string filename) {
+void Wanda :: read_system(string filename, vector<string> types,
+                          vector<string> terms) {
+  if(filename == "override") {
+    InputReaderAFSM reader;
+    if (!reader.read_override(Sigma, rules, types, terms)) aborted = true;
+    return;
+  }
   if (filename == "--manual") {
     InputReaderAFSM reader;
     if (!reader.read_manually(Sigma, rules)) aborted = true;
@@ -655,13 +656,46 @@ void Wanda :: certify_termination_status() {
 }
 
 /** main function **/
+vector<string> decoder(const string &s) {
+  std::vector<std::string> result;
+  std::stringstream ss(s);
+  std::string item;
+
+  // Split by pipe '|'
+  while (std::getline(ss, item, '|')) {
+      // Trim whitespace
+      size_t first = item.find_first_not_of(" \t\r\n");
+      if (first == std::string::npos) continue;
+      size_t last = item.find_last_not_of(" \t\r\n");
+      result.push_back(item.substr(first, (last - first + 1)));
+  }
+  return result;
+}
 
 int main(int argc, char **argv) {
-  vector<string> args;
-  for (int i = 1; i < argc; i++) args.push_back(argv[i]);
+  vector<string> types;
+  vector<string> termsLR;
+  vector<string> termsRL;
+  types = decoder(argv[1]);
+  termsLR = decoder(argv[2]);
+  termsRL = decoder(argv[3]);
+  cout << " terms: \n";
+  for(auto & it: types) {
+    cout << it << '\n';
+  }
 
+  cout << " terms lr: \n";
+  for(auto & it: termsLR) {
+    cout << it << '\n';
+  }
+  cout << " terms rl: \n";
+  for(auto & it: termsRL) {
+    cout << it << '\n';
+  }
   Wanda wanda;
-  wanda.run(args);
+  wanda.run(types, termsLR);
+  wanda.run(types, termsRL);
+
   return 0;
 }
 
