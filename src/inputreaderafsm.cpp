@@ -82,6 +82,33 @@ MatchRule *InputReaderAFSM :: read_rule(string description,
   return rule;
 }
 
+bool InputReaderAFSM::read_override(Alphabet &Sigma,
+                   vector<MatchRule*> &rules, vector<string> &types, vector<string> &terms) {
+  for(string &type : types) {
+    PConstant f = read_constant(type);
+    if (f == NULL) {
+      cout << "Could not parse function symbol [" + type + "]: "
+            << last_warning << endl;
+      last_warning = "";
+      return false;
+    }
+    else {
+      Sigma.add(f->to_string(), f->query_type()->copy());
+      delete f;
+    }
+  }
+  for(string &term : terms) {
+    MatchRule *rule = read_rule(term, Sigma);
+    if (rule == NULL) {
+      cout << "Could not parse rule [" << term << "]: "
+           << last_warning << endl;
+      last_warning = "";
+    }
+    else rules.push_back(rule);
+  }
+
+  return true;
+  }
 bool InputReaderAFSM :: read_manually(Alphabet &Sigma,
                                        vector<MatchRule*> &rules) {
   cout << "Please enter each symbol in the alphabet, together with "
